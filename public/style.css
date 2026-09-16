@@ -1,0 +1,668 @@
+/* ---------------------------------------------------------
+   Design tokens — Apple / iOS Human Interface Guidelines
+   Concept: everyday utility screens (start, join, waiting,
+   ended) read like a native iOS app — light, airy, San
+   Francisco type, system blue actions, grouped cards. The
+   in-call screen switches to a true-black immersive canvas
+   with translucent "Material" controls, matching how Apple's
+   own FaceTime stays dark in-call even under a light system
+   theme, so the video itself stays the focus.
+--------------------------------------------------------- */
+:root {
+  /* System (light) surfaces — used on every screen except the live call */
+  --sys-bg:        #F2F2F7;   /* iOS systemGroupedBackground */
+  --sys-card:       #FFFFFF;   /* iOS secondarySystemGroupedBackground */
+  --sys-fill:       #F2F2F7;   /* input/select fill */
+  --sys-separator:  rgba(60, 60, 67, 0.16);
+  --sys-text:       #1C1C1E;   /* label */
+  --sys-text-2:     #6E6E73;   /* secondary label */
+  --sys-text-3:     #AEAEB2;   /* tertiary label / placeholder */
+
+  /* System accent colors (iOS semantic palette) */
+  --blue:   #007AFF;
+  --blue-press: #0062CC;
+  --green:  #34C759;
+  --red:    #FF3B30;
+  --orange: #FF9500;
+
+  /* In-call (dark, FaceTime-style) surfaces */
+  --ink:        #000000;
+  --material:   rgba(255, 255, 255, 0.14);   /* translucent control fill */
+  --material-2: rgba(255, 255, 255, 0.22);
+  --on-dark:    #FFFFFF;
+  --on-dark-2:  rgba(255, 255, 255, 0.68);
+
+  --font: -apple-system, "SF Pro Text", BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  /* Apple-style spring easing for interactive motion */
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--sys-bg);
+  color: var(--sys-text);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+}
+
+body { overflow: hidden; }
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  touch-action: manipulation; /* kills the old mobile browsers' 300ms tap delay */
+}
+
+/* ---------- Screen switching ---------- */
+.screen {
+  display: none;
+  height: 100vh;
+  height: 100dvh; /* accounts for mobile browser chrome (address bar) resizing the viewport */
+  width: 100vw;
+}
+.screen.active {
+  display: flex;
+  animation: screen-in 0.35s var(--ease);
+}
+@keyframes screen-in {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+#landing, #preview, #waiting, #ended {
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--sys-bg);
+}
+
+/* ---------- Card (grouped-table style) ---------- */
+.card {
+  width: 100%;
+  max-width: 380px;
+  text-align: center;
+  background: var(--sys-card);
+  border-radius: 22px;
+  padding: 32px 28px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 12px 32px rgba(0,0,0,0.06);
+}
+
+.card h1 {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 28px;
+  color: var(--sys-text);
+}
+
+.card h2 {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0 0 20px;
+  color: var(--sys-text);
+}
+
+.footnote {
+  color: var(--sys-text-2);
+  font-size: 13px;
+  line-height: 1.6;
+  margin-top: 24px;
+}
+
+/* ---------- Buttons (iOS bordered-prominent / tinted / plain) ---------- */
+.primary-btn {
+  width: 100%;
+  padding: 15px 20px;
+  border-radius: 14px;
+  border: none;
+  background: var(--blue);
+  color: #FFFFFF;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: transform 0.15s var(--spring), background-color 0.1s ease, opacity 0.1s ease;
+}
+.primary-btn:hover { background: var(--blue-press); }
+.primary-btn:active { transform: scale(0.97); opacity: 0.85; }
+.primary-btn:disabled {
+  background: var(--sys-fill);
+  color: var(--sys-text-3);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.secondary-btn {
+  padding: 15px 18px;
+  border-radius: 14px;
+  border: none;
+  background: var(--sys-fill);
+  color: var(--sys-text);
+  font-size: 16px;
+  font-weight: 600;
+  transition: transform 0.15s var(--spring), background-color 0.1s ease;
+}
+.secondary-btn:hover { background: #E9E9EE; }
+.secondary-btn:active { transform: scale(0.97); }
+
+.text-btn {
+  border: none;
+  background: none;
+  color: var(--blue);
+  font-size: 16px;
+  font-weight: 500;
+  margin-top: 18px;
+  padding: 6px 10px;
+  transition: opacity 0.1s ease;
+}
+.text-btn:hover { opacity: 0.7; }
+.text-btn:active { opacity: 0.5; }
+
+/* ---------- Landing divider + join row ---------- */
+.divider {
+  display: flex;
+  align-items: center;
+  color: var(--sys-text-3);
+  font-size: 13px;
+  margin: 20px 0;
+}
+.divider::before, .divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--sys-separator);
+}
+.divider span { padding: 0 12px; }
+
+.join-row {
+  display: flex;
+  gap: 8px;
+}
+.join-row input {
+  flex: 1;
+  min-width: 0;
+  padding: 15px 16px;
+  border-radius: 14px;
+  border: none;
+  background: var(--sys-fill);
+  color: var(--sys-text);
+  font-size: 16px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase; /* codes are insensitive to how you type them */
+}
+.join-row input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.25);
+}
+.join-row input::placeholder { color: var(--sys-text-3); letter-spacing: normal; }
+
+/* ---------- Waiting screen ---------- */
+.code-box {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  padding: 18px;
+  border-radius: 16px;
+  background: var(--sys-fill);
+  color: var(--sys-text);
+  margin-bottom: 16px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: transform 0.15s var(--spring), background-color 0.1s ease;
+}
+.code-box:active { transform: scale(0.98); background: #E9E9EE; }
+
+.spinner {
+  width: 22px;
+  height: 22px;
+  margin: 24px auto 0;
+  border-radius: 50%;
+  border: 2.5px solid var(--sys-separator);
+  border-top-color: var(--blue);
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---------- Preview screen ---------- */
+.preview-card { max-width: 420px; }
+
+.preview-video-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #000;
+  margin-bottom: 18px;
+}
+#previewVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1); /* mirror, feels natural for self-view */
+}
+.preview-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--on-dark-2);
+  font-size: 13px;
+  text-align: center;
+  padding: 20px;
+}
+.preview-placeholder svg { width: 32px; height: 32px; opacity: 0.7; }
+.preview-placeholder.hidden { display: none; }
+
+.preview-controls {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.ctrl-btn.small { width: 46px; height: 46px; }
+.ctrl-btn.small svg { width: 19px; height: 19px; }
+
+/* Settings-row style pickers (native <select> made to look like an
+   iOS grouped-list row, with a trailing chevron) */
+.device-selects {
+  display: flex;
+  flex-direction: column;
+  border-radius: 14px;
+  background: var(--sys-fill);
+  margin-bottom: 22px;
+  overflow: hidden;
+  text-align: left;
+}
+.select-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 14px;
+  gap: 10px;
+}
+.select-row + .select-row { border-top: 1px solid var(--sys-separator); }
+.select-row-label {
+  font-size: 15px;
+  color: var(--sys-text);
+  font-weight: 400;
+  flex: none;
+}
+.select-row select {
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--sys-text-2);
+  font-size: 15px;
+  font-family: inherit;
+  text-align: right;
+  direction: rtl;
+  flex: 1;
+  min-width: 0;
+  padding-right: 18px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 20' fill='none' stroke='%23AEAEB2' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 3l6 7-6 7'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: 7px 12px;
+}
+.select-row select:focus { outline: none; }
+.select-row select:disabled { color: var(--sys-text-3); }
+
+/* ---------- Toasts (iOS-style notification banners) ---------- */
+#toastContainer {
+  position: fixed;
+  top: max(16px, env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  pointer-events: none;
+  width: 100%;
+  padding: 0 16px;
+}
+
+.toast {
+  pointer-events: auto;
+  max-width: 420px;
+  width: 100%;
+  padding: 13px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(20px) saturate(1.6);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  color: var(--sys-text);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 12px 28px rgba(0,0,0,0.12);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  animation: toast-in 0.4s var(--spring);
+}
+.toast-dot {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  margin-top: 5px;
+  border-radius: 50%;
+  background: var(--sys-text-3);
+}
+.toast.error .toast-dot { background: var(--red); }
+.toast.success .toast-dot { background: var(--green); }
+.toast.info .toast-dot { background: var(--orange); }
+.toast-text { flex: 1; }
+.toast-close {
+  flex: none;
+  background: none;
+  border: none;
+  color: var(--sys-text-3);
+  font-size: 17px;
+  line-height: 1;
+  padding: 0;
+}
+.toast-close:hover { color: var(--sys-text-2); }
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(-14px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes toast-out {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.96); }
+}
+.toast.leaving { animation: toast-out 0.15s ease forwards; }
+
+/* ---------- Call screen (dark, immersive — FaceTime-style) ---------- */
+#call {
+  position: relative;
+  background: var(--ink);
+}
+
+#remoteVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: var(--ink);
+}
+
+#localVideoWrap {
+  position: absolute;
+  bottom: 104px;
+  right: 16px;
+  width: 108px;
+  height: 144px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: var(--ink);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  overflow: hidden;
+}
+
+#localVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transform: scaleX(-1);
+}
+
+/* "Camera off" placeholder shown over the self-view when the camera
+   track is disabled (a disabled track just renders black). */
+.cam-off-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: var(--on-dark-2);
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+}
+.cam-off-overlay svg { width: 26px; height: 26px; opacity: 0.8; }
+.cam-off-overlay.hidden { display: none; }
+
+/* The remote-side variant spans the whole video area, so scale its text
+   up and add a subtle vignette so it reads as "intentional", not broken. */
+#remoteCamOff {
+  z-index: 1;
+  font-size: 15px;
+  gap: 12px;
+  background: rgba(0, 0, 0, 0.72);
+}
+#remoteCamOff svg { width: 44px; height: 44px; }
+
+#statusBar {
+  position: absolute;
+  top: max(18px, env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--material);
+  backdrop-filter: blur(20px) saturate(1.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--on-dark-2);
+  max-width: calc(100vw - 32px);
+  box-sizing: border-box;
+}
+
+#statusDot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--orange); /* connecting */
+  transition: background 0.3s ease;
+}
+#statusDot.connected { background: var(--green); }
+#statusDot.lost { background: var(--red); }
+
+/* Text is the item most likely to overflow a narrow screen — let it
+   truncate with an ellipsis instead of breaking out of the pill.
+   (min-width: 0 overrides the flex-item default that otherwise blocks
+   shrinking below content size, which was the root cause of the
+   misalignment on mobile.) */
+#connectionStatus {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#qualityLabel { flex: none; font-size: 12px; color: var(--on-dark-2); }
+#qualityLabel.good { color: var(--green); }
+#qualityLabel.fair { color: var(--orange); }
+#qualityLabel.poor { color: var(--red); }
+#qualityLabel:empty { display: none; }
+
+/* ---------- End-to-end verification (safety number) ---------- */
+.verify-chip {
+  position: absolute;
+  /* Below the centered status pill so small screens never overlap it */
+  top: calc(max(18px, env(safe-area-inset-top)) + 44px);
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: none;
+  background: var(--material);
+  backdrop-filter: blur(20px) saturate(1.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  color: var(--on-dark-2);
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 2;
+}
+.verify-chip svg { width: 13px; height: 13px; }
+.verify-chip.hidden { display: none; }
+
+.verify-sheet {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.55);
+}
+.verify-sheet.hidden { display: none; }
+.verify-card { max-width: 320px; }
+.verify-sub {
+  color: var(--sys-text-2);
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0 0 14px;
+  text-align: left;
+}
+.verify-code {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 14px;
+  border-radius: 14px;
+  background: var(--sys-fill);
+  color: var(--sys-text);
+  margin-bottom: 18px;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  white-space: nowrap;
+}
+
+#controls {
+  position: absolute;
+  bottom: max(28px, env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 16px;
+  padding: 10px;
+  border-radius: 999px;
+  background: var(--material);
+  backdrop-filter: blur(24px) saturate(1.8);
+  -webkit-backdrop-filter: blur(24px) saturate(1.8);
+}
+
+.ctrl-btn {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  border: none;
+  background: var(--material-2);
+  color: var(--on-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, transform 0.15s var(--spring);
+}
+.ctrl-btn svg { width: 22px; height: 22px; }
+.ctrl-btn:hover { background: rgba(255,255,255,0.3); }
+.ctrl-btn:active { transform: scale(0.92); }
+.ctrl-btn.active-off {
+  background: #FFFFFF;
+  color: #1C1C1E;
+}
+.ctrl-btn.danger {
+  background: var(--red);
+  color: #fff;
+}
+.ctrl-btn.danger:hover { background: #FF291D; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 480px) {
+  #localVideoWrap {
+    width: 84px;
+    height: 112px;
+    bottom: 98px;
+    right: 12px;
+  }
+  .ctrl-btn { width: 50px; height: 50px; }
+  .card { padding: 28px 22px; border-radius: 20px; }
+
+  #statusBar {
+    font-size: 12px;
+    gap: 6px;
+    padding: 7px 13px;
+  }
+  #qualityLabel { font-size: 11px; }
+
+  .code-box { font-size: 26px; padding: 16px; letter-spacing: 0.1em; }
+}
+
+/* Very small phones (e.g. iPhone SE / older Android) */
+@media (max-width: 360px) {
+  #landing, #preview, #waiting, #ended { padding: 16px; }
+  .card { padding: 24px 18px; }
+  .card h1 { font-size: 26px; }
+  .join-row { flex-wrap: wrap; }
+  .join-row input { width: 100%; }
+  .join-row button { width: 100%; }
+
+  #statusBar {
+    max-width: calc(100vw - 24px);
+    font-size: 11.5px;
+    padding: 6px 12px;
+  }
+  #controls { gap: 12px; padding: 8px; }
+  .ctrl-btn { width: 46px; height: 46px; }
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation: none; border-top-color: var(--sys-separator); }
+  * { transition: none !important; animation: none !important; }
+}
+
+/* Landscape phones: vertical space is scarce — shrink the PiP so it covers
+   less of the video, and keep it clear of the control rail. */
+@media (max-height: 480px) and (orientation: landscape) {
+  #localVideoWrap {
+    width: 72px;
+    height: 96px;
+    bottom: 76px;
+    right: 12px;
+  }
+}
+
+#previewRetryBtn.hidden { display: none; }
+#restartCallBtn { margin-bottom: 14px; }
+
+/* ---------- Focus visibility ---------- */
+button:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}

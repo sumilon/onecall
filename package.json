@@ -1,0 +1,19 @@
+{
+  "name": "onecall",
+  "version": "1.0.0",
+  "description": "Lightweight, zero-storage, end-to-end encrypted 1:1 video calling web app",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node regression-test.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "jsdom": "^24.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#F2F2F7" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<title>Onecall</title>
+<link id="favicon" rel="icon" type="image/png" href="" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===== TOASTS ===== -->
+  <div id="toastContainer" aria-live="polite"></div>
+
+  <!-- ===== LANDING SCREEN ===== -->
+  <div id="landing" class="screen active">
+    <div class="card">
+      <h1>Onecall</h1>
+
+      <button id="startCallBtn" class="primary-btn">Start a new call</button>
+
+      <div class="divider"><span>or</span></div>
+
+      <div class="join-row">
+        <input id="joinCodeInput" type="text" placeholder="Enter a call code" maxlength="8"
+               autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" />
+        <button id="joinCallBtn" class="secondary-btn">Join</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PREVIEW SCREEN (check camera/mic before joining) ===== -->
+  <div id="preview" class="screen">
+    <div class="card preview-card">
+      <h2 id="previewTitle">Check your camera & mic</h2>
+
+      <div class="preview-video-wrap">
+        <video id="previewVideo" autoplay playsinline muted></video>
+        <div id="previewPlaceholder" class="preview-placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="2.5" y="6" width="13" height="12" rx="2.5"/>
+            <path d="M15.5 10.5 21 7v10l-5.5-3.5"/>
+          </svg>
+          <span id="previewPlaceholderText">Requesting camera access…</span>
+        </div>
+        <div id="previewCamOff" class="preview-placeholder hidden">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <rect x="2.5" y="6" width="13" height="12" rx="2.5"/>
+            <path d="M15.5 10.5 21 7v10l-5.5-3.5"/>
+            <line x1="4" y1="4" x2="20" y2="20"/>
+          </svg>
+          <span>Camera is off</span>
+        </div>
+      </div>
+
+      <div class="preview-controls">
+        <button id="previewMicBtn" class="ctrl-btn small" title="Mute/unmute" aria-label="Mute microphone">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z"/>
+            <path d="M19 11a7 7 0 0 1-14 0"/>
+            <path d="M12 18v3"/>
+          </svg>
+        </button>
+        <button id="previewCamBtn" class="ctrl-btn small" title="Camera on/off" aria-label="Toggle camera">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2.5" y="6" width="13" height="12" rx="2.5"/>
+            <path d="M15.5 10.5 21 7v10l-5.5-3.5"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="device-selects">
+        <div class="select-row">
+          <span class="select-row-label">Camera</span>
+          <select id="cameraSelect"></select>
+        </div>
+        <div class="select-row">
+          <span class="select-row-label">Microphone</span>
+          <select id="micSelect"></select>
+        </div>
+      </div>
+
+      <button id="previewContinueBtn" class="primary-btn" disabled>Continue</button>
+      <button id="previewRetryBtn" class="text-btn hidden">Try again</button>
+      <button id="previewCancelBtn" class="text-btn">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ===== WAITING / SHARE SCREEN ===== -->
+  <div id="waiting" class="screen">
+    <div class="card">
+      <h2>Share this to start the call</h2>
+      <div class="code-box" id="roomCodeDisplay">------</div>
+      <button id="copyLinkBtn" class="secondary-btn">Copy link</button>
+      <p class="footnote">Waiting for the other person to join…</p>
+      <div class="spinner"></div>
+      <button id="cancelWaitBtn" class="text-btn">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ===== CALL SCREEN ===== -->
+  <div id="call" class="screen">
+    <video id="remoteVideo" autoplay playsinline></video>
+    <div id="remoteCamOff" class="cam-off-overlay hidden">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <rect x="2.5" y="6" width="13" height="12" rx="2.5"/>
+        <path d="M15.5 10.5 21 7v10l-5.5-3.5"/>
+        <line x1="4" y1="4" x2="20" y2="20"/>
+      </svg>
+      <span>Camera is off</span>
+    </div>
+    <div id="localVideoWrap">
+      <video id="localVideo" autoplay playsinline muted></video>
+      <div id="localCamOff" class="cam-off-overlay hidden">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <rect x="2.5" y="6" width="13" height="12" rx="2.5"/>
+          <path d="M15.5 10.5 21 7v10l-5.5-3.5"/>
+          <line x1="4" y1="4" x2="20" y2="20"/>
+        </svg>
+        <span>Camera off</span>
+      </div>
+    </div>
+
+    <div id="statusBar" role="status">
+      <span id="statusDot"></span>
+      <span id="connectionStatus">Connecting…</span>
+      <span id="qualityLabel"></span>
+    </div>
+
+    <!-- End-to-end verification: both screens compute the same short code
+         from the two DTLS certificate fingerprints. Same numbers on both
+         screens = nobody is sitting in the middle of the call. -->
+    <button id="verifyChip" class="verify-chip hidden" aria-label="Verify this call is end-to-end encrypted">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3l7 3v5c0 4.5-3 8.4-7 10-4-1.6-7-5.6-7-10V6l7-3z"/>
+        <path d="M9.5 12l1.8 1.8 3.2-3.6"/>
+      </svg>
+      <span>Verify</span>
+    </button>
+
+    <div id="verifySheet" class="verify-sheet hidden" role="dialog" aria-modal="true" aria-labelledby="verifyTitle">
+      <div class="card verify-card">
+        <h2 id="verifyTitle">Verify this call</h2>
+        <p class="verify-sub">Read the numbers below aloud to the other person. If both screens show exactly the same numbers, your call is connected directly with no one in between.</p>
+        <div id="verifyCodeText" class="verify-code">· · · ·</div>
+        <button id="verifyCloseBtn" class="primary-btn">Done</button>
+      </div>
+    </div>
+
+    <div id="controls">
+      <button id="toggleMicBtn" class="ctrl-btn" title="Mute/unmute" aria-label="Mute microphone">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z"/>
+          <path d="M19 11a7 7 0 0 1-14 0"/>
+          <path d="M12 18v3"/>
+        </svg>
+      </button>
+      <button id="toggleCamBtn" class="ctrl-btn" title="Camera on/off" aria-label="Toggle camera">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2.5" y="6" width="13" height="12" rx="2.5"/>
+          <path d="M15.5 10.5 21 7v10l-5.5-3.5"/>
+        </svg>
+      </button>
+      <button id="hangupBtn" class="ctrl-btn danger" title="Hang up" aria-label="Hang up">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 12.5C4 8 8 5 12 5s8 3 8 7.5c0 1-.6 1.7-1.6 1.9l-2.6.5c-.8.2-1.6-.3-1.9-1l-.5-1.3c-.2-.6-.9-1-1.5-.8-1.2.4-2.6.4-3.8 0-.6-.2-1.3.2-1.5.8l-.5 1.3c-.3.7-1.1 1.2-1.9 1l-2.6-.5C4.6 14.2 4 13.5 4 12.5Z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== ERROR / ENDED SCREEN ===== -->
+  <div id="ended" class="screen">
+    <div class="card">
+      <h2 id="endedMessage">Call ended</h2>
+      <button id="restartCallBtn" class="secondary-btn">Start another call</button>
+      <button id="backHomeBtn" class="primary-btn">Back to home</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
